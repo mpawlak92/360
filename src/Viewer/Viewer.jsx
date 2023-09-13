@@ -20,7 +20,13 @@ const Viewer = () => {
 	const handleMouseDown = (e) => {
 		if (zoomLevel === 1) {
 			setIsDown(true);
-			setStartX(e.pageX - viewerContainer.current.offsetLeft);
+
+			if (e.pageX === undefined) {
+				setStartX(e.touches[0].pageX - viewerContainer.current.offsetLeft);
+			} else {
+				setStartX(e.pageX - viewerContainer.current.offsetLeft);
+			}
+
 			setScrollLeftState(viewerContainer.current.scrollLeft);
 			setMouseMoved(0);
 		}
@@ -30,9 +36,11 @@ const Viewer = () => {
 		if (!isDown) {
 			return;
 		}
-
 		const currentMousePositionInsideContainer =
-			e.pageX - viewerContainer.current.offsetLeft;
+			e.pageX === undefined
+				? e.touches[0].pageX - viewerContainer.current.offsetLeft
+				: e.pageX - viewerContainer.current.offsetLeft;
+
 		setMouseMovedPrev(mouseMoved);
 		setMouseMoved(currentMousePositionInsideContainer - startX);
 	};
@@ -48,6 +56,7 @@ const Viewer = () => {
 		}
 	};
 	useEffect(() => {
+		setMouseMoved(Math.round(mouseMoved));
 		if (mouseMoved % 2 === 0 && mouseMoved !== 0) {
 			if (mouseMoved >= 0) {
 				if (mouseMoved > mouseMovedPrev) {
@@ -89,14 +98,19 @@ const Viewer = () => {
 			<div
 				className={'viewer-container ' + (isDown ? 'is-grabbing' : '')}
 				ref={viewerContainer}
+				onTouchStart={(e) => handleMouseDown(e)}
+				onTouchEnd={() => setIsDown(false)}
+				onTouchCancel={() => setIsDown(false)}
+				onTouchMove={(e) => handleMouseMove(e)}
+				//mouse events
 				onMouseDown={(e) => {
 					handleMouseDown(e);
 				}}
 				onMouseUp={() => setIsDown(false)}
+				onMouseMove={(e) => handleMouseMove(e)}
 				onMouseLeave={() => {
 					setIsDown(false);
-				}}
-				onMouseMove={(e) => handleMouseMove(e)}>
+				}}>
 				<img
 					src={fimeName}
 					className='viewer'
