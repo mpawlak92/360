@@ -15,7 +15,7 @@ const Viewer = () => {
 
 	const viewerContainer = useRef();
 
-	const fimeName = `assets/Fotel_HDR/Fotel_HDR_${index}.jpg`;
+	const fileName = `assets/Fotel_HDR/Fotel_HDR_${index}.jpg`;
 
 	const handleMouseDown = (e) => {
 		if (zoomLevel === 1) {
@@ -56,6 +56,20 @@ const Viewer = () => {
 		}
 	};
 	useEffect(() => {
+		if (isDown) {
+			document.addEventListener('mousemove', handleMouseMove, {
+				passive: false,
+			});
+			document.addEventListener('mouseup', () => {
+				setIsDown(false);
+				document.removeEventListener('mousemove', handleMouseMove);
+			});
+		}
+		if (isDown === false) {
+			return () => {
+				document.removeEventListener('mousemove', handleMouseMove);
+			};
+		}
 		setMouseMoved(Math.round(mouseMoved));
 		if (mouseMoved % 2 === 0 && mouseMoved !== 0) {
 			if (mouseMoved >= 0) {
@@ -92,27 +106,34 @@ const Viewer = () => {
 				}
 			}
 		}
-	}, [scrollLeftState, mouseMoved]);
+		return () => {
+			document.removeEventListener('mousemove', handleMouseMove);
+		};
+	}, [scrollLeftState, mouseMoved, isDown]);
 	return (
 		<>
 			<div
 				className={'viewer-container ' + (isDown ? 'is-grabbing' : '')}
 				ref={viewerContainer}
-				onTouchStart={(e) => handleMouseDown(e)}
-				onTouchEnd={() => setIsDown(false)}
-				onTouchCancel={() => setIsDown(false)}
-				onTouchMove={(e) => handleMouseMove(e)}
+				// onTouchStart={(e) => handleMouseDown(e)}
+				// onTouchEnd={() => setIsDown(false)}
+				// onTouchCancel={() => setIsDown(false)}
+				// onTouchMove={(e) => handleMouseMove(e)}
 				//mouse events
 				onMouseDown={(e) => {
 					handleMouseDown(e);
 				}}
-				onMouseUp={() => setIsDown(false)}
-				onMouseMove={(e) => handleMouseMove(e)}
-				onMouseLeave={() => {
-					setIsDown(false);
-				}}>
+				// onMouseUp={() => {
+				// 	setIsDown(false);
+				// 	document.removeEventListener('mousemove', handleMouseMove);
+				// }}
+				// onMouseMove={(e) => handleMouseMove(e)}
+				// onMouseLeave={() => {
+				// 	setIsDown(false);
+				// }}>
+			>
 				<img
-					src={fimeName}
+					src={fileName}
 					className='viewer'
 					loading='lazy'
 					style={{ transform: `scale(${zoomLevel})` }}
