@@ -33,6 +33,7 @@ const Viewer = () => {
 	};
 
 	const handleMouseMove = (e) => {
+		e.preventDefault();
 		if (!isDown) {
 			return;
 		}
@@ -57,17 +58,29 @@ const Viewer = () => {
 	};
 	useEffect(() => {
 		if (isDown) {
+			//mouse listeners
 			document.addEventListener('mousemove', handleMouseMove, {
 				passive: false,
 			});
+
 			document.addEventListener('mouseup', () => {
 				setIsDown(false);
 				document.removeEventListener('mousemove', handleMouseMove);
 			});
+
+			//touch listener
+			document.addEventListener('touchmove', handleMouseMove, {
+				passive: false,
+			});
+
+			document.addEventListener('touchend', () => {
+				setIsDown(false);
+				document.removeEventListener('touchmove', handleMouseMove);
+			});
 		}
 		if (isDown === false) {
 			return () => {
-				document.removeEventListener('mousemove', handleMouseMove);
+				document.removeEventListener('touchmove', handleMouseMove);
 			};
 		}
 		setMouseMoved(Math.round(mouseMoved));
@@ -108,6 +121,7 @@ const Viewer = () => {
 		}
 		return () => {
 			document.removeEventListener('mousemove', handleMouseMove);
+			document.removeEventListener('touchmove', handleMouseMove);
 		};
 	}, [scrollLeftState, mouseMoved, isDown]);
 	return (
@@ -115,23 +129,10 @@ const Viewer = () => {
 			<div
 				className={'viewer-container ' + (isDown ? 'is-grabbing' : '')}
 				ref={viewerContainer}
-				// onTouchStart={(e) => handleMouseDown(e)}
-				// onTouchEnd={() => setIsDown(false)}
-				// onTouchCancel={() => setIsDown(false)}
-				// onTouchMove={(e) => handleMouseMove(e)}
-				//mouse events
+				onTouchStart={(e) => handleMouseDown(e)}
 				onMouseDown={(e) => {
 					handleMouseDown(e);
-				}}
-				// onMouseUp={() => {
-				// 	setIsDown(false);
-				// 	document.removeEventListener('mousemove', handleMouseMove);
-				// }}
-				// onMouseMove={(e) => handleMouseMove(e)}
-				// onMouseLeave={() => {
-				// 	setIsDown(false);
-				// }}>
-			>
+				}}>
 				<img
 					src={fileName}
 					className='viewer'
