@@ -1,51 +1,54 @@
 .viewer-container {
-	position: relative;
-	display: flex;
-	margin: 20px;
-	box-shadow: 0 0 16px 2px rgba($color: #9f9e9e, $alpha: 0.2);
-	border-radius: 10px;
-	white-space: nowrap;
-	user-select: none;
-	cursor: grab;
-	overflow: hidden;
+  position: relative;
+  display: flex;
+  margin: 20px;
+  box-shadow: 0 0 16px 2px rgba($color: #9f9e9e, $alpha: 0.2);
+  border-radius: 10px;
+  white-space: nowrap;
+  user-select: none;
+  cursor: grab;
+  overflow: hidden;
 }
 
 .viewer {
-	width: 100%;
-	aspect-ratio: 1/1;
-	pointer-events: none;
+  width: 100%;
+  aspect-ratio: 1/1;
+  pointer-events: none;
 }
 
 .is-grabbing {
-	cursor: grabbing;
+  cursor: grabbing;
 }
 
 .control-panel {
-	position: absolute;
-	right: 0;
-	top: 0;
-	width: 15%;
-	height: 100%;
-	display: flex;
-	flex-direction: column;
-	align-items: center;
-	padding: 5% 0;
-	font-size: 1rem;
-	background-color: trasparent;
+  position: absolute;
+  right: 0;
+  top: 0;
+  width: 15%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 5% 0;
+  font-size: 1rem;
+  background-color: trasparent;
 }
 .magnifier-btn {
-	width: 65%;
-	aspect-ratio: 1/1;
-	margin-bottom: 10px;
-	padding-top: 10%;
-	font-size: 1em;
-	font-weight: bold;
-	background-color: rgba($color: #d8dde4, $alpha: 0.5);
-	border: none;
-	box-shadow: 0 0 1px 1px rgba($color: #000000, $alpha: 0.1);
-	border-radius: 50%;
-	cursor: pointer;
-	&:hover {
-		background-color: rgba($color: #a4acb000, $alpha: 0.5);
-	}
+  width: 65%;
+  aspect-ratio: 1/1;
+  margin-bottom: 10px;
+  padding-top: 5%;
+  font-weight: bold;
+  background-color: rgba($color: #d8dde4, $alpha: 0.5);
+  border: none;
+  box-shadow: 0 0 1px 1px rgba($color: #000000, $alpha: 0.1);
+  border-radius: 50%;
+  cursor: pointer;
+  &:hover {
+    background-color: rgba($color: #a4acb000, $alpha: 0.5);
+  }
+}
+.magnifier-icon {
+  width: 80%;
+  height: 40%;
 }

@@ -1,19 +1,19 @@
 :root {
-	background-color: #ffffff;
+  background-color: #ffffff;
 }
 * {
-	margin: 0;
-	padding: 0;
-	box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
 }
 
 .container {
-	width: 100vw;
-	height: 100vh;
-	display: flex;
-	justify-content: center;
-	align-items: center;
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 .wrapper {
-	width: 400px;
+  width: 50%;
 }

@@ -5,151 +5,229 @@ import './Viewer.scss';
 import { SlMagnifierAdd, SlMagnifierRemove } from 'react-icons/sl';
 
 const Viewer = () => {
-	const [index, setIndex] = useState(0);
-	const [isDown, setIsDown] = useState(false);
-	const [startX, setStartX] = useState(0);
-	const [scrollLeftState, setScrollLeftState] = useState(null);
-	const [mouseMoved, setMouseMoved] = useState(0);
-	const [mouseMovedPrev, setMouseMovedPrev] = useState(0);
-	const [zoomLevel, setZoomLevel] = useState(1);
+  //it is rotation spped value minimum is 1
+  let rotationSpeed = 5;
 
-	const viewerContainer = useRef();
+  const [index, setIndex] = useState(0);
+  const [isDown, setIsDown] = useState(false);
+  const [startX, setStartX] = useState(0);
+  const [scrollLeftState, setScrollLeftState] = useState(null);
+  const [mouseMoved, setMouseMoved] = useState(0);
+  const [mouseMovedPrev, setMouseMovedPrev] = useState(0);
+  const [zoom, setZoom] = useState(1);
+  const [position, setPosition] = useState({ x: 0, y: 0 });
 
-	const fileName = `assets/Fotel_HDR/Fotel_HDR_${index}.jpg`;
+  const fileName = `assets/item/Fotel_HDR_${index}.jpg`;
 
-	const handleMouseDown = (e) => {
-		if (zoomLevel === 1) {
-			setIsDown(true);
+  const imageRef = useRef(null);
+  const containerRef = useRef(null);
 
-			if (e.pageX === undefined) {
-				setStartX(e.touches[0].pageX - viewerContainer.current.offsetLeft);
-			} else {
-				setStartX(e.pageX - viewerContainer.current.offsetLeft);
-			}
+  if (rotationSpeed < 1) {
+    rotationSpeed = 1;
+  }
+  const handleMouseDown = (e) => {
+    setIsDown(true);
 
-			setScrollLeftState(viewerContainer.current.scrollLeft);
-			setMouseMoved(0);
-		}
-	};
+    if (e.pageX === undefined) {
+      setStartX(e.touches[0].pageX - containerRef.current.offsetLeft);
+    } else {
+      setStartX(e.pageX - containerRef.current.offsetLeft);
+    }
 
-	const handleMouseMove = (e) => {
-		e.preventDefault();
-		if (!isDown) {
-			return;
-		}
-		const currentMousePositionInsideContainer =
-			e.pageX === undefined
-				? e.touches[0].pageX - viewerContainer.current.offsetLeft
-				: e.pageX - viewerContainer.current.offsetLeft;
+    setScrollLeftState(containerRef.current.scrollLeft);
+    setMouseMoved(0);
+  };
 
-		setMouseMovedPrev(mouseMoved);
-		setMouseMoved(currentMousePositionInsideContainer - startX);
-	};
-	const zoomIn = () => {
-		if (zoomLevel < 3) {
-			setZoomLevel(zoomLevel + 1);
-		}
-	};
+  const handleMouseMove = (e) => {
+    e.preventDefault();
+    if (!isDown) {
+      return;
+    }
+    const currentMousePositionInsideContainer =
+      e.pageX === undefined
+        ? e.touches[0].pageX - containerRef.current.offsetLeft
+        : e.pageX - containerRef.current.offsetLeft;
 
-	const zoomOut = () => {
-		if (zoomLevel > 1) {
-			setZoomLevel(zoomLevel - 1);
-		}
-	};
-	useEffect(() => {
-		if (isDown) {
-			//mouse listeners
-			document.addEventListener('mousemove', handleMouseMove, {
-				passive: false,
-			});
+    setMouseMovedPrev(mouseMoved);
+    setMouseMoved(currentMousePositionInsideContainer - startX);
+  };
 
-			document.addEventListener('mouseup', () => {
-				setIsDown(false);
-				document.removeEventListener('mousemove', handleMouseMove);
-			});
+  const handleRotation = () => {
+    let rotationSppedValue = Math.round(
+      window.innerWidth / (20 * rotationSpeed)
+    );
+    if (window.innerWidth > 1000)
+      rotationSppedValue = Math.round(window.innerWidth / (30 * rotationSpeed));
+    if (window.innerWidth > 4000)
+      rotationSppedValue = Math.round(window.innerWidth / (60 * rotationSpeed));
 
-			//touch listener
-			document.addEventListener('touchmove', handleMouseMove, {
-				passive: false,
-			});
+    setMouseMoved(Math.round(mouseMoved));
+    if (mouseMoved % rotationSppedValue === 0 && mouseMoved !== 0) {
+      if (mouseMoved >= 0) {
+        if (mouseMoved > mouseMovedPrev) {
+          if (index === 35) {
+            setIndex(0);
+            return;
+          } else {
+            setIndex((prev) => prev + 1);
+          }
+        } else {
+          if (index === 0) {
+            setIndex(35);
+            return;
+          } else {
+            setIndex((prev) => prev - 1);
+          }
+        }
+      } else {
+        if (mouseMoved < mouseMovedPrev) {
+          if (index === 0) {
+            setIndex(35);
+            return;
+          } else {
+            setIndex((prev) => prev - 1);
+          }
+        } else {
+          if (index === 35) {
+            setIndex(0);
+            return;
+          } else {
+            setIndex((prev) => prev + 1);
+          }
+        }
+      }
+    }
+  };
 
-			document.addEventListener('touchend', () => {
-				setIsDown(false);
-				document.removeEventListener('touchmove', handleMouseMove);
-			});
-		}
-		if (isDown === false) {
-			return () => {
-				document.removeEventListener('touchmove', handleMouseMove);
-			};
-		}
-		setMouseMoved(Math.round(mouseMoved));
-		if (mouseMoved % 2 === 0 && mouseMoved !== 0) {
-			if (mouseMoved >= 0) {
-				if (mouseMoved > mouseMovedPrev) {
-					if (index === 35) {
-						setIndex(0);
-						return;
-					} else {
-						setIndex((prev) => prev + 1);
-					}
-				} else {
-					if (index === 0) {
-						setIndex(35);
-						return;
-					} else {
-						setIndex((prev) => prev - 1);
-					}
-				}
-			} else {
-				if (mouseMoved < mouseMovedPrev) {
-					if (index === 0) {
-						setIndex(35);
-						return;
-					} else {
-						setIndex((prev) => prev - 1);
-					}
-				} else {
-					if (index === 35) {
-						setIndex(0);
-						return;
-					} else {
-						setIndex((prev) => prev + 1);
-					}
-				}
-			}
-		}
-		return () => {
-			document.removeEventListener('mousemove', handleMouseMove);
-			document.removeEventListener('touchmove', handleMouseMove);
-		};
-	}, [scrollLeftState, mouseMoved, isDown]);
-	return (
-		<>
-			<div
-				className={'viewer-container ' + (isDown ? 'is-grabbing' : '')}
-				ref={viewerContainer}
-				onTouchStart={(e) => handleMouseDown(e)}
-				onMouseDown={(e) => {
-					handleMouseDown(e);
-				}}>
-				<img
-					src={fileName}
-					className='viewer'
-					loading='lazy'
-					style={{ transform: `scale(${zoomLevel})` }}
-				/>
-				<div className='control-panel'>
-					<button className='magnifier-btn' onClick={zoomIn}>
-						<SlMagnifierAdd />
-					</button>
-					<button className='magnifier-btn' onClick={zoomOut}>
-						<SlMagnifierRemove />
-					</button>
-				</div>
-			</div>
-		</>
-	);
+  const handleZoomInPlace = (e) => {
+    const imageElement = imageRef.current;
+    const containerElement = containerRef.current;
+
+    if (!imageElement || !containerElement) return;
+
+    const containerRect = containerElement.getBoundingClientRect();
+    const mouseX = e.clientX - containerRect.left;
+    const mouseY = e.clientY - containerRect.top;
+
+    if (zoom < 3) {
+      const newZoom = zoom === 3 ? 1 : zoom + 1;
+
+      // Calculate new position to zoom in cursor place
+      //   const newX = position.x - mouseX + containerRect.width / 2;
+      //   const newY = position.y - mouseY + containerRect.height / 2;
+
+      /// Calculate the new position to zoom in cursor place
+      const deltaX = (mouseX - containerRect.width / 2) / zoom;
+      const deltaY = (mouseY - containerRect.height / 2) / zoom;
+
+      // Calculate the new position based on the current position and zoom
+      let newX = position.x - deltaX;
+      let newY = position.y - deltaY;
+
+      // Limit newX and newY to stay within bounds
+      const maxX = (imageElement.width * newZoom - containerRect.width) / 2;
+      const maxY = (imageElement.height * newZoom - containerRect.height) / 2;
+      newX = Math.max(-maxX, Math.min(maxX, newX));
+      newY = Math.max(-maxY, Math.min(maxY, newY));
+
+      // Update zoom and position
+      setZoom(newZoom);
+      setPosition({ x: newX, y: newY });
+    } else {
+      setZoom(1);
+      setPosition({ x: 0, y: 0 });
+    }
+  };
+
+  const handleZoomOut = () => {
+    if (zoom > 2) setZoom(zoom - 1);
+    if (zoom === 2) {
+      setZoom(1);
+      setPosition({ x: 0, y: 0 });
+    }
+    if (zoom === 1) return;
+  };
+
+  const handleImageDrag = (e) => {
+    if (isDown && zoom > 1) {
+      e.preventDefault();
+      const { movementX, movementY } = e;
+
+      setPosition((prevPosition) => ({
+        x: prevPosition.x + movementX,
+        y: prevPosition.y + movementY,
+      }));
+    }
+  };
+
+  useEffect(() => {
+    if (isDown && zoom === 1) {
+      //mouse listeners
+      document.addEventListener('mousemove', handleMouseMove, {
+        passive: false,
+      });
+
+      document.addEventListener('mouseup', () => {
+        setIsDown(false);
+        document.removeEventListener('mousemove', handleMouseMove);
+      });
+
+      //touch listener
+      document.addEventListener('touchmove', handleMouseMove, {
+        passive: false,
+      });
+
+      document.addEventListener('touchend', () => {
+        setIsDown(false);
+        document.removeEventListener('touchmove', handleMouseMove);
+      });
+    }
+
+    const currentRef = containerRef.current;
+
+    if (isDown && zoom > 1) {
+      currentRef.addEventListener('mousemove', handleImageDrag);
+    }
+
+    handleRotation();
+
+    return () => {
+      currentRef.removeEventListener('mousemove', handleImageDrag);
+      document.removeEventListener('mousemove', handleMouseMove);
+      document.removeEventListener('touchmove', handleMouseMove);
+    };
+  }, [scrollLeftState, mouseMoved, isDown]);
+  return (
+    <>
+      <div
+        className={'viewer-container ' + (isDown ? 'is-grabbing' : '')}
+        ref={containerRef}
+        onTouchStart={(e) => handleMouseDown(e)}
+        onMouseDown={(e) => {
+          handleMouseDown(e);
+        }}
+        onDoubleClick={handleZoomInPlace}>
+        <img
+          src={fileName}
+          className='viewer'
+          loading='lazy'
+          style={{
+            width: `100%`,
+            transform: `scale(${zoom}) translate(${position.x}px, ${position.y}px)`,
+          }}
+          ref={imageRef}
+        />
+        <div className='control-panel'>
+          <button className='magnifier-btn' onClick={handleZoomInPlace}>
+            <SlMagnifierAdd className='magnifier-icon' />
+          </button>
+          <button className='magnifier-btn' onClick={handleZoomOut}>
+            <SlMagnifierRemove className='magnifier-icon' />
+          </button>
+        </div>
+      </div>
+    </>
+  );
 };
 
 export default Viewer;

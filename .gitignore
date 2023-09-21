@@ -11,7 +11,7 @@ node_modules
 dist
 dist-ssr
 *.local
-public/assets/Fotel_HDR
+public/assets/item
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json
