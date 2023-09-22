@@ -28,27 +28,32 @@
   height: 100%;
   display: flex;
   flex-direction: column;
-  align-items: center;
-  padding: 5% 0;
+  align-items: end;
+  padding: 10px 0;
   font-size: 1rem;
   background-color: trasparent;
 }
 .magnifier-btn {
-  width: 65%;
+  width: 100%;
+  max-width: 60px;
   aspect-ratio: 1/1;
-  margin-bottom: 10px;
-  padding-top: 5%;
+  margin: 0 10px 10px 0;
   font-weight: bold;
   background-color: rgba($color: #d8dde4, $alpha: 0.5);
   border: none;
-  box-shadow: 0 0 1px 1px rgba($color: #000000, $alpha: 0.1);
   border-radius: 50%;
+  box-shadow: 0 0 1px 1px rgba($color: #000000, $alpha: 0.1);
   cursor: pointer;
   &:hover {
     background-color: rgba($color: #a4acb000, $alpha: 0.5);
   }
+  @media (min-width: 400px) {
+    width: 65%;
+  }
+  @media (min-width: 550px) {
+    padding-top: 5%;
+  }
 }
 .magnifier-icon {
-  width: 80%;
   height: 40%;
 }

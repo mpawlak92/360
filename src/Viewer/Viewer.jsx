@@ -6,7 +6,7 @@ import { SlMagnifierAdd, SlMagnifierRemove } from 'react-icons/sl';
 
 const Viewer = () => {
   //it is rotation spped value minimum is 1
-  let rotationSpeed = 5;
+  let rotationSpeed = 4.5;
 
   const [index, setIndex] = useState(0);
   const [isDown, setIsDown] = useState(false);
@@ -53,13 +53,29 @@ const Viewer = () => {
   };
 
   const handleRotation = () => {
-    let rotationSppedValue = Math.round(
-      window.innerWidth / (20 * rotationSpeed)
-    );
-    if (window.innerWidth > 1000)
-      rotationSppedValue = Math.round(window.innerWidth / (30 * rotationSpeed));
-    if (window.innerWidth > 4000)
-      rotationSppedValue = Math.round(window.innerWidth / (60 * rotationSpeed));
+    let rotationSppedValue;
+    if (window.innerWidth < 500)
+      rotationSppedValue = Math.round(window.innerWidth / (15 * rotationSpeed));
+    if (window.innerWidth < 1000)
+      rotationSppedValue = Math.round(window.innerWidth / (25 * rotationSpeed));
+    if (window.innerWidth < 1500)
+      rotationSppedValue = Math.round(window.innerWidth / (37 * rotationSpeed));
+    if (window.innerWidth < 2000)
+      rotationSppedValue = Math.round(window.innerWidth / (50 * rotationSpeed));
+    if (window.innerWidth < 2500)
+      rotationSppedValue = Math.round(window.innerWidth / (62 * rotationSpeed));
+    if (window.innerWidth < 3000)
+      rotationSppedValue = Math.round(window.innerWidth / (75 * rotationSpeed));
+    if (window.innerWidth < 3500)
+      rotationSppedValue = Math.round(window.innerWidth / (87 * rotationSpeed));
+    if (window.innerWidth < 4000)
+      rotationSppedValue = Math.round(
+        window.innerWidth / (100 * rotationSpeed)
+      );
+    if (window.innerWidth < 4500)
+      rotationSppedValue = Math.round(
+        window.innerWidth / (112 * rotationSpeed)
+      );
 
     setMouseMoved(Math.round(mouseMoved));
     if (mouseMoved % rotationSppedValue === 0 && mouseMoved !== 0) {
@@ -100,6 +116,13 @@ const Viewer = () => {
   };
 
   const handleZoomInPlace = (e) => {
+    const isButton = e.target.tagName === 'BUTTON';
+    const isSvg = e.target.tagName === 'svg';
+    const isPath = e.target.tagName === 'path';
+
+    if (isButton || isSvg || isPath) {
+      return; // Return early if the clicked element is a button
+    }
     const imageElement = imageRef.current;
     const containerElement = containerRef.current;
 
@@ -127,6 +150,7 @@ const Viewer = () => {
       newY = Math.max(-maxY, Math.min(maxY, newY));
 
       // Update zoom and position
+
       setZoom(newZoom);
       setPosition({ x: newX, y: newY });
     } else {
@@ -134,8 +158,12 @@ const Viewer = () => {
       setPosition({ x: 0, y: 0 });
     }
   };
+  const handleZoomInByBtn = () => {
+    if (zoom === 3) return;
+    setZoom(zoom + 1);
+  };
 
-  const handleZoomOut = () => {
+  const handleZoomOutByBtn = () => {
     if (zoom > 2) setZoom(zoom - 1);
     if (zoom === 2) {
       setZoom(1);
@@ -216,7 +244,7 @@ const Viewer = () => {
         <div className='control-panel'>
           <button
             className='magnifier-btn'
-            onClick={handleZoomInPlace}
+            onClick={handleZoomInByBtn}
             style={
               zoom === 3
                 ? {
@@ -229,7 +257,7 @@ const Viewer = () => {
           </button>
           <button
             className='magnifier-btn'
-            onClick={handleZoomOut}
+            onClick={handleZoomOutByBtn}
             style={
               zoom === 1
                 ? {
