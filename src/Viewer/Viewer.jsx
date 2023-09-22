@@ -112,10 +112,6 @@ const Viewer = () => {
     if (zoom < 3) {
       const newZoom = zoom === 3 ? 1 : zoom + 1;
 
-      // Calculate new position to zoom in cursor place
-      //   const newX = position.x - mouseX + containerRect.width / 2;
-      //   const newY = position.y - mouseY + containerRect.height / 2;
-
       /// Calculate the new position to zoom in cursor place
       const deltaX = (mouseX - containerRect.width / 2) / zoom;
       const deltaY = (mouseY - containerRect.height / 2) / zoom;
@@ -218,10 +214,30 @@ const Viewer = () => {
           ref={imageRef}
         />
         <div className='control-panel'>
-          <button className='magnifier-btn' onClick={handleZoomInPlace}>
+          <button
+            className='magnifier-btn'
+            onClick={handleZoomInPlace}
+            style={
+              zoom === 3
+                ? {
+                    backgroundColor: 'rgba(216, 221, 228, 0.1)',
+                    cursor: 'default',
+                  }
+                : {}
+            }>
             <SlMagnifierAdd className='magnifier-icon' />
           </button>
-          <button className='magnifier-btn' onClick={handleZoomOut}>
+          <button
+            className='magnifier-btn'
+            onClick={handleZoomOut}
+            style={
+              zoom === 1
+                ? {
+                    backgroundColor: 'rgba(216, 221, 228, 0.1)',
+                    cursor: 'default',
+                  }
+                : {}
+            }>
             <SlMagnifierRemove className='magnifier-icon' />
           </button>
         </div>
