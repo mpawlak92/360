@@ -7,7 +7,7 @@ import { SlMagnifierAdd, SlMagnifierRemove } from 'react-icons/sl';
 const Viewer = () => {
   //it is rotation spped value minimum is 1
   let rotationSpeed = 4.5;
-  const fileNanme = 'Fotel_HDR_';
+  const itemName = 'Fotel_HDR_';
   const fileExtension = 'webp';
 
   const [index, setIndex] = useState(0);
@@ -19,7 +19,7 @@ const Viewer = () => {
   const [zoom, setZoom] = useState(1);
   const [position, setPosition] = useState({ x: 0, y: 0 });
 
-  const fileName = `assets/item/${fileNanme}${index}.${fileExtension}`;
+  const fileName = `assets/item/${itemName}${index}.${fileExtension}`;
 
   const imageRef = useRef(null);
   const containerRef = useRef(null);
@@ -188,7 +188,7 @@ const Viewer = () => {
   useEffect(() => {
     const imageUrlsToPreload = Array.from(
       { length: 36 },
-      (_, index) => `assets/item/${fileNanme}${index}.${fileExtension}`
+      (_, index) => `assets/item/${itemName}${index}.${fileExtension}`
     );
 
     // Function to preload images
