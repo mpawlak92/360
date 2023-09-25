@@ -7,6 +7,8 @@ import { SlMagnifierAdd, SlMagnifierRemove } from 'react-icons/sl';
 const Viewer = () => {
   //it is rotation spped value minimum is 1
   let rotationSpeed = 4.5;
+  const fileNanme = 'Fotel_HDR_';
+  const fileExtension = 'webp';
 
   const [index, setIndex] = useState(0);
   const [isDown, setIsDown] = useState(false);
@@ -17,11 +19,11 @@ const Viewer = () => {
   const [zoom, setZoom] = useState(1);
   const [position, setPosition] = useState({ x: 0, y: 0 });
 
-  const fileName = `assets/item/Fotel_HDR_${index}.jpg`;
+  const fileName = `assets/item/${fileNanme}${index}.${fileExtension}`;
 
   const imageRef = useRef(null);
   const containerRef = useRef(null);
-
+  const [imagesReady, setImagesReady] = useState(false);
   if (rotationSpeed < 1) {
     rotationSpeed = 1;
   }
@@ -183,93 +185,135 @@ const Viewer = () => {
       }));
     }
   };
+  useEffect(() => {
+    const imageUrlsToPreload = Array.from(
+      { length: 36 },
+      (_, index) => `assets/item/${fileNanme}${index}.${fileExtension}`
+    );
+
+    // Function to preload images
+    const preloadImages = async () => {
+      try {
+        const imagePromises = imageUrlsToPreload.map((url) => {
+          return new Promise((resolve, reject) => {
+            const image = new Image();
+            image.src = url;
+            image.onload = resolve;
+            image.onerror = reject;
+          });
+        });
+
+        await Promise.all(imagePromises);
+
+        // All images are preloaded (some may have failed to decode)
+        setImagesReady(true);
+      } catch (error) {
+        console.error('Error preloading images:', error);
+        // Handle errors here, if needed
+        // For example, you can set a flag to indicate that some images failed to load
+      }
+    };
+
+    // Call the preloadImages function when the component mounts
+    preloadImages();
+  }, []);
 
   useEffect(() => {
-    if (isDown && zoom === 1) {
-      //mouse listeners
-      document.addEventListener('mousemove', handleMouseMove, {
-        passive: false,
-      });
+    if (imagesReady) {
+      if (isDown && zoom === 1) {
+        //mouse listeners
+        document.addEventListener('mousemove', handleMouseMove, {
+          passive: false,
+        });
 
-      document.addEventListener('mouseup', () => {
-        setIsDown(false);
+        document.addEventListener('mouseup', () => {
+          setIsDown(false);
+          document.removeEventListener('mousemove', handleMouseMove);
+        });
+
+        //touch listener
+        document.addEventListener('touchmove', handleMouseMove, {
+          passive: false,
+        });
+
+        document.addEventListener('touchend', () => {
+          setIsDown(false);
+          document.removeEventListener('touchmove', handleMouseMove);
+        });
+      }
+
+      const currentRef = containerRef.current;
+
+      if (isDown && zoom > 1) {
+        currentRef.addEventListener('mousemove', handleImageDrag);
+      }
+
+      handleRotation();
+
+      return () => {
+        currentRef.removeEventListener('mousemove', handleImageDrag);
         document.removeEventListener('mousemove', handleMouseMove);
-      });
-
-      //touch listener
-      document.addEventListener('touchmove', handleMouseMove, {
-        passive: false,
-      });
-
-      document.addEventListener('touchend', () => {
-        setIsDown(false);
         document.removeEventListener('touchmove', handleMouseMove);
-      });
+      };
     }
-
-    const currentRef = containerRef.current;
-
-    if (isDown && zoom > 1) {
-      currentRef.addEventListener('mousemove', handleImageDrag);
-    }
-
-    handleRotation();
-
-    return () => {
-      currentRef.removeEventListener('mousemove', handleImageDrag);
-      document.removeEventListener('mousemove', handleMouseMove);
-      document.removeEventListener('touchmove', handleMouseMove);
-    };
   }, [scrollLeftState, mouseMoved, isDown]);
   return (
     <>
-      <div
-        className={'viewer-container ' + (isDown ? 'is-grabbing' : '')}
-        ref={containerRef}
-        onTouchStart={(e) => handleMouseDown(e)}
-        onMouseDown={(e) => {
-          handleMouseDown(e);
-        }}
-        onDoubleClick={handleZoomInPlace}>
-        <img
-          src={fileName}
-          className='viewer'
-          loading='lazy'
-          style={{
-            width: `100%`,
-            transform: `scale(${zoom}) translate(${position.x}px, ${position.y}px)`,
+      {/* Render the viewer component only when images are ready */}
+      {imagesReady ? (
+        <div
+          className={'viewer-container ' + (isDown ? 'is-grabbing' : '')}
+          ref={containerRef}
+          onTouchStart={(e) => handleMouseDown(e)}
+          onMouseDown={(e) => {
+            handleMouseDown(e);
           }}
-          ref={imageRef}
-        />
-        <div className='control-panel'>
-          <button
-            className='magnifier-btn'
-            onClick={handleZoomInByBtn}
-            style={
-              zoom === 3
-                ? {
-                    backgroundColor: 'rgba(216, 221, 228, 0.1)',
-                    cursor: 'default',
-                  }
-                : {}
-            }>
-            <SlMagnifierAdd className='magnifier-icon' />
-          </button>
-          <button
-            className='magnifier-btn'
-            onClick={handleZoomOutByBtn}
-            style={
-              zoom === 1
-                ? {
-                    backgroundColor: 'rgba(216, 221, 228, 0.1)',
-                    cursor: 'default',
-                  }
-                : {}
-            }>
-            <SlMagnifierRemove className='magnifier-icon' />
-          </button>
+          onDoubleClick={handleZoomInPlace}>
+          <img
+            src={fileName}
+            className='viewer'
+            loading='lazy'
+            style={{
+              width: `100%`,
+              transform: `scale(${zoom}) translate(${position.x}px, ${position.y}px)`,
+            }}
+            ref={imageRef}
+          />
+          <div className='control-panel'>
+            <button
+              className='magnifier-btn'
+              onClick={handleZoomInByBtn}
+              style={
+                zoom === 3
+                  ? {
+                      backgroundColor: 'rgba(216, 221, 228, 0.1)',
+                      cursor: 'default',
+                    }
+                  : {}
+              }>
+              <SlMagnifierAdd className='magnifier-icon' />
+            </button>
+            <button
+              className='magnifier-btn'
+              onClick={handleZoomOutByBtn}
+              style={
+                zoom === 1
+                  ? {
+                      backgroundColor: 'rgba(216, 221, 228, 0.1)',
+                      cursor: 'default',
+                    }
+                  : {}
+              }>
+              <SlMagnifierRemove className='magnifier-icon' />
+            </button>
+          </div>
         </div>
-      </div>
+      ) : (
+        <div className='loading-spinner'>
+          <div className='spinner'></div>
+          <p>Loading images...</p>
+        </div>
+      )}
     </>
   );
 };
